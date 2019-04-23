@@ -82,5 +82,76 @@ function ghibliMoviesAPIFun() {
 ghibliMoviesAPIFun();
 
 
+/**
+ * ##############################
+ * ES6 - API Calls (does NOT work in Internet Explorer)
+ * uses fetch() and .then() / .catch() - aka Promises
+ * Let's talk to Chuck Norris shall we...
+ * http://www.icndb.com/api/
+ * 
+ * Really great review of fetch over here:
+ * https://davidwalsh.name/fetch 
+ */
+function callingChuckMyFriends() {
+  // We're wrapping the entire call in an eventListener, waiting for chuck to fire off...
+  document.getElementById('calling-chuck').addEventListener('click', function() {
+    
+    // console.log('anything happening?') // check your click event!
 
+    // const / let are new ways to declare a variable (ES6)
+    // Request is another object you can set up to handle APIs requests
+    // The main Request('https://yourURLhere.com') handles the API endpoint
+    // Because it's an object, you set it's properties using an object 
+    const request = new Request('http://api.icndb.com/jokes/random/3', {
+      method: 'GET'
+    })
 
+    // This is where we're going to put our dara
+    const destination = document.getElementById('data-drop');
+
+    // fetch then uses request to make the request
+    // You can chain .then() in here to handle the response
+    // Notice much like event handling, the API response handler automatically gets an implicit response to handle
+    // You just have to pass it into the function
+    // The `() => {}` is called a fat arrow function, it's an implicit function present in ES6
+    // ^^^ It's the same as: function() {} 
+    // You also don't need semicolons anymore in ES6! (but they are often still used)
+    fetch(request)
+      .then( (response) => {
+        // console.log('status: ', response); // uncomment to see a raw API response
+
+        // We're going handle the response if it's status code is 200
+        if (response.status === 200) {
+
+          // .json() is another way to transform an API response into a real JS object
+          // Why do we return? So we can hand off to another .then() statement
+          // This keeps our code clean, each .then() does something different
+          return response.json();
+        }
+      })
+      .then( (responseJSON) => {
+        // Notice in the object that .value contains the data we want, so we can pull it out
+        // We have an array of objects, super common data structure to deal with
+        // console.log('responseJSON: ', responseJSON);  // check out what each joke looks like in the console
+        
+        // We'll again use forEach to cycle through the array, accessing the different 
+        responseJSON.value.forEach( (joke) => {
+          // console.log(joke) // check out joke to see what's going on
+
+          const jokeCard = document.createElement('div');
+          jokeCard.setAttribute('class', 'card');
+
+          const h1 = document.createElement('h1');
+          h1.textContent = joke.id;
+
+          var p = document.createElement('p');
+          p.textContent = joke.joke
+
+          destination.appendChild(jokeCard);
+          jokeCard.appendChild(h1);
+          jokeCard.appendChild(p);      
+        })
+      })
+  })
+}
+callingChuckMyFriends();
